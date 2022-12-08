@@ -22,7 +22,7 @@ def _get_node_text(G, vertex, show_labels, show_position):
     return text
 
 def visualise_graph(
-        graph: nx.Graph, center_level=1, hist=[], show_labels=True, 
+        graph: nx.Graph, center_level=0, hist=[], show_labels=True, 
         show_position=True, width=8, height=6, dpi=80
     ) -> None:
     '''
@@ -40,22 +40,22 @@ def visualise_graph(
     * show_positions: boolean deciding whether to show positions (based on the "pos_x" and "pos_y" params)
     * width, height, dpi: matplotlib args
     '''
-    G = graph
+    G = graph.underlying
     plt.figure(figsize=(width, height), dpi=dpi)
-    for (v1, v2) in graph.edges():
-        if hist and (v1 not in hist or v2 not in hist):
-            continue
+    for (v1, v2) in G.edges():
         l1 = nx.get_node_attributes(G, "level")[v1]
         l2 = nx.get_node_attributes(G, "level")[v2]
+        if hist and (l1 not in hist or l2 not in hist):
+            continue
         x1 = nx.get_node_attributes(G, "pos_x")[v1]
         y1 = nx.get_node_attributes(G, "pos_y")[v1] + _recenter_by_hist(l1, center_level)
         x2 = nx.get_node_attributes(G, "pos_x")[v2]
         y2 = nx.get_node_attributes(G, "pos_y")[v2] + _recenter_by_hist(l2, center_level)
         plt.plot([x1, x2], [y1, y2], color="black")
-    for vertex in graph:
-        if hist and vertex not in hist:
-            continue
+    for vertex in G:
         l = nx.get_node_attributes(G, "level")[vertex]
+        if hist and l not in hist:
+            continue
         x = nx.get_node_attributes(G, "pos_x")[vertex]
         y = nx.get_node_attributes(G, "pos_y")[vertex] + _recenter_by_hist(l, center_level)
         plt.plot(x, y, marker='o', color=_get_color_by_level(l), markersize=8)
