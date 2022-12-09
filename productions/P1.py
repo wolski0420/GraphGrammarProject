@@ -1,12 +1,12 @@
 from utils import StandardizedGraph
 
 def P1(graph: StandardizedGraph):
-    v0 = graph.find_by_label("i")[0]
+    v0 = graph.find_by_label("El")[0]
     level = v0.level()
 
-    graph.modify_label(v0, "I")
+    graph.modify_label(v0, "el")
 
-    v1 = graph.add_vert(pos_x = 0, pos_y = 0, level = level + 1, label = "i")
+    v1 = graph.add_vert(pos_x = 0, pos_y = 0, level = level + 1, label = "I")
     v2 = graph.add_vert(pos_x = -10, pos_y = 10, level = level + 1, label = "E")
     v3 = graph.add_vert(pos_x = 10, pos_y = 10, level = level + 1, label = "E")
     v4 = graph.add_vert(pos_x = 10, pos_y = -10, level = level + 1, label = "E")
