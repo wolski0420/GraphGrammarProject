@@ -1,6 +1,9 @@
 import networkx as nx
 from matplotlib import pyplot as plt
 
+from utils import StandardizedGraph
+
+
 def _get_color_by_level(level: int):
     match level:
         case 0: return "blue"
@@ -22,7 +25,7 @@ def _get_node_text(G, vertex, show_labels, show_position):
     return text
 
 def visualise_graph(
-        graph: nx.Graph, center_level=0, hist=[], show_labels=True, 
+        graph: StandardizedGraph, center_level=0, hist=[], show_labels=True,
         show_position=True, width=8, height=6, dpi=80
     ) -> None:
     '''
