@@ -34,12 +34,17 @@ class SurroundingMatcher:
             (4, {"label": "E"})
         ]
         breaking_verts = [(5 + n, {"label": "E"}) for n in range(self.broken_edges)]
-        base_edges = [(0, 1), (0, 2), (0, 3), (0, 4)]
         n_outer_verts = 4 + self.broken_edges
+        inner_edges = [
+            (0, 1),
+            (0, max(2, n_outer_verts - 5)),
+            (0, max(3, n_outer_verts - 3)),
+            (0, max(4, n_outer_verts - 1))
+        ]
         outer_edges = [(n, (n + 1)) for n in range(1, n_outer_verts)] + [(n_outer_verts, 1)]
         expected_subgraph = nx.Graph()
         expected_subgraph.add_nodes_from(base_verts + breaking_verts)
-        expected_subgraph.add_edges_from(base_edges + outer_edges)
+        expected_subgraph.add_edges_from(inner_edges + outer_edges)
         return expected_subgraph
 
     def get_valid_subgraph(self, graph, i_vertex, level: int):
