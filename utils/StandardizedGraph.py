@@ -3,7 +3,7 @@ from networkx.algorithms.isomorphism import is_isomorphic
 from matplotlib import pyplot as plt
 
 
-class Vert():
+class Vert:
     def __init__(self, graph: nx.Graph, vertex):
         self.graph = graph
         self.underlying = vertex
@@ -31,15 +31,15 @@ class Vert():
         return not self.__eq__(other)
 
 
-class StandardizedGraph():
-    '''
+class StandardizedGraph:
+    """
     Standardized form of a networkx graph, where the vertex IDs do not have to be manually managed.
 
     The underlying networkX graph can be found in .underlying, but direct modification of that is undesirable.
     Consider adding methods to this class instead.
-    
+
     Internal vertices and the graph in general are all mutable.
-    '''
+    """
 
     def __init__(self):
         self.underlying = nx.Graph()
@@ -67,6 +67,16 @@ class StandardizedGraph():
                 l == label]
 
     # add your methods here
+
+    def get_neighbours(self, v: Vert, level: int, label: str):
+        """
+        get list of neighbours of v on selected level
+        """
+        return list(filter(
+            lambda neigh: nx.get_node_attributes(self.underlying, "level")[neigh] == level and
+                          nx.get_node_attributes(self.underlying, "label")[neigh] == label,
+            self.underlying.neighbors(v.underlying)
+        ))
 
     def __eq__(self, other):
         return isinstance(other, StandardizedGraph) \
