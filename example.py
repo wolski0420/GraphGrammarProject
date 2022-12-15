@@ -8,6 +8,8 @@ from productions.P4 import match_P4, P4
 import matplotlib.pyplot as plt
 from networkx.algorithms.isomorphism import is_isomorphic
 from itertools import combinations
+from productions.P5 import match_P5, P5
+from productions.P6 import match_P6, P6
 
 
 if __name__ == "__main__":
@@ -30,13 +32,15 @@ if __name__ == "__main__":
 
     e5 = graph.add_vert(pos_x = 0, pos_y = -10, level = 0, label="E")
     e6 = graph.add_vert(pos_x = 10, pos_y = 0, level = 0, label="E")
+    e7 = graph.add_vert(pos_x = -10, pos_y = 0, level = 0, label="E")
+    e8 = graph.add_vert(pos_x = 0, pos_y = 10, level = 0, label="E")
 
     graph.add_edges([
         (i, e1), (i, e2), (i, e3), (i, e4),
-        (e1, e2),
         (e2, e6), (e3, e6),
-        (e3, e5), (e4, e5), 
-        (e1, e4)
+        (e3, e5), (e4, e5),
+        (e4, e7), (e1, e7),
+        (e1, e8), (e2, e8),
     ])
 
     i_2 = graph.add_vert(pos_x = 30, pos_y = 30, level = 0, label="I")
@@ -49,15 +53,15 @@ if __name__ == "__main__":
 
     graph.add_edges([
         (i_2, e1_2), (i_2, e2_2), (i_2, e3_2), (i_2, e4_2),
-        (e1_2, e2_2), (e2_2, e3_2), (e3_2, e4_2), (e1_2, e5_2), 
+        (e1_2, e2_2), (e2_2, e3_2), (e3_2, e4_2), (e1_2, e5_2),
         (e4_2, e5_2)
     ])
 
     subgraph = graph.underlying
 
-    similar = match_P4(graph, 0)
+    similar = match_P6(graph, 0)
     for x in similar:
-        graph = P4(graph, x)
+        graph = P6(graph, x)
     # graph = P4(graph, similar[1])
 
 
