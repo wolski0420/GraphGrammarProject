@@ -69,7 +69,6 @@ def visualise_graph(
             lbl_x_pos = 0.5
             lbl_y_pos = -1
 
-            print(graph.find_by_pos(x, y_pos)[0], vertex)
             if (graph.find_by_pos(x, y_pos)[0]).underlying == vertex:
                 lbl_x_pos = 0.5
                 lbl_y_pos = 1
