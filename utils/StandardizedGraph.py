@@ -68,6 +68,18 @@ class StandardizedGraph:
 
     # add your methods here
 
+    def find_by_pos(self, pos_x: float, pos_y:float):
+
+        return [Vert(self.underlying, v) for v in list(filter(
+            lambda node: nx.get_node_attributes(self.underlying, "pos_x")[node] == pos_x and
+                          nx.get_node_attributes(self.underlying, "pos_y")[node] == pos_y,
+            self.underlying.nodes
+        ))]
+
+    def get_edges(self, v: Vert):
+        return list(self.underlying.edges(v.underlying))
+
+
     def get_neighbours(self, v: Vert, level: int, label: str):
         """
         get list of neighbours of v on selected level
