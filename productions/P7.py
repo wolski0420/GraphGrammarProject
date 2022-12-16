@@ -23,6 +23,10 @@ def P7(graph: StandardizedGraph, v0: Vert, v1: Vert,v2: Vert ):
                  graph.get_neighbours(v2_vertices[0], v2.level(), label="E"))
     v2_0_neigh.remove(v1.underlying)
 
+
+    graph.remove_vertex(v0_vertices[0])
+    graph.remove_vertex(v1_vertices[0])
+    graph.remove_vertex(v2_vertices[0])
     for neigh_0 in v0_0_neigh:
         graph.add_edge(v0_vertices[1], Vert(graph.underlying, neigh_0))
 

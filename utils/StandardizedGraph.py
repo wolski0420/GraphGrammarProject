@@ -68,8 +68,13 @@ class StandardizedGraph:
 
     # add your methods here
 
-    def find_by_pos(self, pos_x: float, pos_y:float):
+    def remove_vertex(self, v: Vert):
+        self.underlying.remove_node(v.underlying)
 
+    def find_by_pos(self, pos_x: float, pos_y:float):
+        """
+            returns all vertexes which has given position
+        """
         return [Vert(self.underlying, v) for v in list(filter(
             lambda node: nx.get_node_attributes(self.underlying, "pos_x")[node] == pos_x and
                           nx.get_node_attributes(self.underlying, "pos_y")[node] == pos_y,
