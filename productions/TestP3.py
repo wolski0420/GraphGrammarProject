@@ -385,29 +385,29 @@ class TestP3(unittest.TestCase):
         old_e2 = expected_graph.add_vert(pos_x=4, pos_y=4, level=level, label="E")
         old_e3 = expected_graph.add_vert(pos_x=4, pos_y=-4, level=level, label="E")
         old_e4 = expected_graph.add_vert(pos_x=-4, pos_y=-4, level=level, label="E")
-        old_e5 = expected_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
-        old_e6 = expected_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
+        old_e14 = expected_graph.add_vert(pos_x=-4, pos_y=0, level=level, label="E")
+        old_e12 = expected_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
         # small 'i', because this is the right side of production
         old_i1 = expected_graph.add_vert(pos_x=0, pos_y=0, level=level, label="i")
         old_e7 = expected_graph.add_vert(pos_x=-12, pos_y=-4, level=level, label="E")
         old_e8 = expected_graph.add_vert(pos_x=-12, pos_y=4, level=level, label="E")
-        old_i2 = expected_graph.add_vert(pos_x=0, pos_y=0, level=level, label="I")
+        old_i2 = expected_graph.add_vert(pos_x=-8, pos_y=0, level=level, label="I")
         expected_graph.add_edges(
-            [(old_e1, old_e6), (old_e6, old_e2), (old_e2, old_e3), (old_e3, old_e4), (old_e4, old_e5),
-             (old_e5, old_e1), (old_e4, old_e7), (old_e7, old_e8), (old_e8, old_e1)])
+            [(old_e1, old_e12), (old_e12, old_e2), (old_e2, old_e3), (old_e3, old_e4), (old_e4, old_e14),
+             (old_e14, old_e1), (old_e4, old_e7), (old_e7, old_e8), (old_e8, old_e1)])
         expected_graph.add_edges([(old_i1, old_e1), (old_i1, old_e2), (old_i1, old_e3), (old_i1, old_e4)])
         expected_graph.add_edges([(old_i2, old_e1), (old_i2, old_e4), (old_i2, old_e7), (old_i2, old_e8)])
 
-        e1 = expected_graph.add_vert(pos_x=-4, pos_y=4, level=level + 1, label="E")
-        e2 = expected_graph.add_vert(pos_x=4, pos_y=4, level=level + 1, label="E")
-        e3 = expected_graph.add_vert(pos_x=4, pos_y=-4, level=level + 1, label="E")
-        e4 = expected_graph.add_vert(pos_x=-4, pos_y=-4, level=level + 1, label="E")
+        e1 = expected_graph.add_vert(pos_x=-12, pos_y=4, level=level + 1, label="E")
+        e2 = expected_graph.add_vert(pos_x=-4, pos_y=4, level=level + 1, label="E")
+        e3 = expected_graph.add_vert(pos_x=-4, pos_y=-4, level=level + 1, label="E")
+        e4 = expected_graph.add_vert(pos_x=-12, pos_y=-4, level=level + 1, label="E")
 
-        e12 = expected_graph.add_vert(pos_x=0, pos_y=4, level=level + 1, label="E")
-        e23 = expected_graph.add_vert(pos_x=4, pos_y=0, level=level + 1, label="E")
-        e34 = expected_graph.add_vert(pos_x=0, pos_y=-4, level=level + 1, label="E")
-        e14 = expected_graph.add_vert(pos_x=-4, pos_y=0, level=level + 1, label="E")
-        e1234 = expected_graph.add_vert(pos_x=0, pos_y=0, level=level + 1, label="E")
+        e12 = expected_graph.add_vert(pos_x=-8, pos_y=4, level=level + 1, label="E")
+        e23 = expected_graph.add_vert(pos_x=-4, pos_y=0, level=level + 1, label="E")
+        e34 = expected_graph.add_vert(pos_x=-8, pos_y=-4, level=level + 1, label="E")
+        e14 = expected_graph.add_vert(pos_x=-12, pos_y=0, level=level + 1, label="E")
+        e1234 = expected_graph.add_vert(pos_x=-8, pos_y=0, level=level + 1, label="E")
 
         expected_graph.add_edges([
             (e1, e12), (e2, e12),
@@ -417,17 +417,17 @@ class TestP3(unittest.TestCase):
             (e12, e1234), (e23, e1234), (e14, e1234), (e34, e1234)
         ])
 
-        i1 = expected_graph.add_vert(pos_x=-2, pos_y=2, level=level + 1, label="I")
+        i1 = expected_graph.add_vert(pos_x=-10, pos_y=2, level=level + 1, label="I")
         expected_graph.add_edges([(i1, e1), (i1, e12), (i1, e14), (i1, e1234), (old_i2, i1)])
 
-        i2 = expected_graph.add_vert(pos_x=2, pos_y=2, level=level + 1, label="I")
+        i2 = expected_graph.add_vert(pos_x=-6, pos_y=2, level=level + 1, label="I")
         expected_graph.add_edges([(i2, e2), (i2, e12), (i2, e23), (i2, e1234), (old_i2, i2)])
 
-        i3 = expected_graph.add_vert(pos_x=2, pos_y=-2, level=level + 1, label="I")
-        expected_graph.add_edges([(i3, e4), (i3, e14), (i3, e34), (i3, e1234), (old_i2, i3)])
+        i3 = expected_graph.add_vert(pos_x=-6, pos_y=-2, level=level + 1, label="I")
+        expected_graph.add_edges([(i3, e3), (i3, e23), (i3, e34), (i3, e1234), (old_i2, i3)])
 
-        i4 = expected_graph.add_vert(pos_x=-2, pos_y=-2, level=level + 1, label="I")
-        expected_graph.add_edges([(i4, e3), (i4, e23), (i4, e34), (i4, e1234), (old_i2, i4)])
+        i4 = expected_graph.add_vert(pos_x=-10, pos_y=-2, level=level + 1, label="I")
+        expected_graph.add_edges([(i4, e4), (i4, e14), (i4, e34), (i4, e1234), (old_i2, i4)])
 
         # for debugging
         # visualise_graph(new_graph, level + 1)
