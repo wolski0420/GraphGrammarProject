@@ -1,7 +1,6 @@
-from utils import StandardizedGraph
+from utils.StandardizedGraph import StandardizedGraph, Vert
 
-def P1(graph: StandardizedGraph):
-    v0 = graph.find_by_label("El")[0]
+def P1(graph: StandardizedGraph, v0: Vert):
     level = v0.level()
 
     graph.modify_label(v0, "el")
@@ -16,3 +15,6 @@ def P1(graph: StandardizedGraph):
     graph.add_edge(v0, v1)
 
     return graph
+
+def match_P1(graph: StandardizedGraph):
+    return graph.find_by_label("El")
