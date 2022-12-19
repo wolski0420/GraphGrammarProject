@@ -15,3 +15,13 @@ print([v.underlying for v in matched])
 graph = P2(graph, matched[0])
 vis.visualise_graph(graph, center_level=2)
 vis.visualise_graph(graph, center_level=2, hist=[2])
+
+matched = match_P2(graph, 2)
+graph = P2(graph, matched[0])
+vis.visualise_graph(graph, center_level=3)
+vis.visualise_graph(graph, center_level=3, hist=[3])
+
+matched = match_P2(graph, 2)
+graph = P2(graph, matched[0])
+vis.visualise_graph(graph, center_level=3)
+vis.visualise_graph(graph, center_level=3, hist=[3])
