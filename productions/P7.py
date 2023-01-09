@@ -1,9 +1,10 @@
+from utils.SameCoordsMatcher import SameCoordsMatcher
 from utils.StandardizedGraph import StandardizedGraph, Vert
 
-def P7(graph: StandardizedGraph, v0: Vert, v1: Vert,v2: Vert ):
+def P7(graph: StandardizedGraph, v0: Vert, v1: Vert,v2: Vert ): # UPDATE 
 
     # find vertices on the same position
-    v0_vertices = graph.find_by_pos(v0.pos_x(), v0.pos_y())
+    v0_vertices = graph.find_by_pos(v0.pos_x(), v0.pos_y()) # REMOVE - pass 6 vertices to function
     v1_vertices = graph.find_by_pos(v1.pos_x(), v1.pos_y())
     v2_vertices = graph.find_by_pos(v2.pos_x(), v2.pos_y())
 
@@ -39,6 +40,7 @@ def P7(graph: StandardizedGraph, v0: Vert, v1: Vert,v2: Vert ):
     return graph
 
 def match_P7(graph: StandardizedGraph, level:int):
-    # graph.in
+    matcher = SameCoordsMatcher(3)    
+    return matcher.match(graph, level)
 
-    return []
+       

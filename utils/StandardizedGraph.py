@@ -94,6 +94,14 @@ class StandardizedGraph:
                           nx.get_node_attributes(self.underlying, "label")[neigh] == label,
             self.underlying.neighbors(v.underlying)
         ))
+        
+    def get_i_neighbours(self, v:Vert, level:int): #level is level of vert
+        I_neighs = self.get_neighbours(v, level, 'I')
+        i_neighs = []
+        for I in I_neighs:
+            i_neighs += self.get_neighbours(Vert(self.underlying, I), level-1, 'i')
+        
+        return i_neighs
 
     def __eq__(self, other):
         return isinstance(other, StandardizedGraph) \
