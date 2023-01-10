@@ -1,17 +1,19 @@
+from utils.SameCoordsMatcher import SameCoordsMatcher
 from utils.StandardizedGraph import StandardizedGraph, Vert
 
-def P8(graph: StandardizedGraph, v0: Vert, v1: Vert, v2:Vert ):
+def P8(graph: StandardizedGraph, v0_group: list, v1_group: list):
 
-    v1_vertices = graph.find_by_pos(v1.pos_x(), v1.pos_y())
-    v2_vertices = graph.find_by_pos(v2.pos_x(), v2.pos_y())
+    v0 = v0_group[0]
+    v1_vertices = [v0_group[1]] + [v1_group[1]]
+    v2_vertices = [v0_group[2]] + [v1_group[2]]
 
-    v1_0_neigh = (graph.get_neighbours(v1_vertices[0], v1.level(), label="I") +
-                  graph.get_neighbours(v1_vertices[0], v1.level(), label="E"))
+    v1_0_neigh = (graph.get_neighbours(v1_vertices[0], v1_vertices[0].level(), label="I") +
+                  graph.get_neighbours(v1_vertices[0], v1_vertices[0].level(), label="E"))
     v1_0_neigh.remove(v0.underlying)
     v1_0_neigh.remove(v2_vertices[0].underlying)
 
-    v2_0_neigh = (graph.get_neighbours(v2_vertices[0], v2.level(), label="I") +
-                  graph.get_neighbours(v2_vertices[0], v2.level(), label="E"))
+    v2_0_neigh = (graph.get_neighbours(v2_vertices[0], v2_vertices[0].level(), label="I") +
+                  graph.get_neighbours(v2_vertices[0], v2_vertices[0].level(), label="E"))
     v2_0_neigh.remove(v1_vertices[0].underlying)
 
     graph.remove_vertex(v1_vertices[0])
@@ -27,5 +29,5 @@ def P8(graph: StandardizedGraph, v0: Vert, v1: Vert, v2:Vert ):
     return graph
 
 def match_P8(graph: StandardizedGraph, level: int):
-
-    return False
+    matcher = SameCoordsMatcher(2)    
+    return matcher.match(graph, level)
