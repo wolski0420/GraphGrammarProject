@@ -92,8 +92,8 @@ def test_P8():
 
     vis.visualise_graph(graph, center_level=1)
 
-    graph = P8(graph, [e1, e3, e2], [e1, e6,e5])
-
+    graph = P8(graph, [e1, e3, e2], [e1, e6,e5])        
+    
     vis.visualise_graph(graph, center_level=1)
 
 

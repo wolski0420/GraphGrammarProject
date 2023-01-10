@@ -22,9 +22,9 @@ class SameCoordsMatcher:
             
             if len(x_neigh)==self.vertices_to_merge:
                 oposite_neigh, opos_i = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices[idx:])
-                group_0, group_1 = self.add_vert_if_needed(oposite_neigh, x_neigh, 'y', graph)
+                group_0, group_1 = self.add_vert_if_needed(x_neigh, oposite_neigh, 'y', graph)
                 
-                is_good = self.check_production_predicats(group_0, group_1, 'y', graph)
+                is_good = self.check_production_predicats(group_0, group_1, x_i, opos_i, 'y', graph)
 
                 # check isomorphic?
                 merge_parts.append((group_0, group_1)) if oposite_neigh is not None and is_good else None
@@ -32,7 +32,7 @@ class SameCoordsMatcher:
             
             if len(y_neigh)==self.vertices_to_merge:
                 oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx:])
-                group_0, group_1 = self.add_vert_if_needed(oposite_neigh, y_neigh, 'x', graph)
+                group_0, group_1 = self.add_vert_if_needed(y_neigh, oposite_neigh, 'x', graph)
                 is_good = self.check_production_predicats(group_0, group_1, 'x', graph)
                 # check isomorphic?
                 merge_parts.append((group_0, group_1)) if oposite_neigh is not None and is_good else None
@@ -55,14 +55,15 @@ class SameCoordsMatcher:
         return group_0, group_1
         
     
-    def check_production_predicats(self, group_0, group_1, coord_name):
+    def check_production_predicats(self, group_0, group_1,  i_0, i_1, coord_name, graph):
         group_0 = self.sort_verts(group_0, coord_name)
         group_1 = self.sort_verts(group_1, coord_name) 
         
+        # check coords values
         for i in range(len(group_0)):
             if group_0[i].pos_x != group_1[i].pos_x or group_0[i].pos_y != group_1[i].pos_y:
                 return False
-            
+        
         if (group_0[0].pos_x+group_0[2].pos_x)/2 != (group_1[0].pos_x+group_1[2].pos_x)/2 :
             return False
         if (group_0[0].pos_y+group_0[2].pos_y)/2 != (group_1[0].pos_y+group_1[2].pos_y)/2 :
@@ -73,7 +74,78 @@ class SameCoordsMatcher:
         if (group_1[0].pos_y+group_1[2].pos_y)/2 != (group_1[1].pos_y) :
             return False
         
+        # check if 'i' vertices are connected by 'E'
+        i_0_neigh = set(graph.get_neighbours(Vert(graph, i_0), Vert(graph, i_0).level, 'E'))
+        i_1_neigh = set(graph.get_neighbours(Vert(graph, i_1), Vert(graph, i_1).level, 'E'))
+        if len(i_0_neigh.intersection(i_1_neigh))==0:
+            return False
+        
+        subgraph_nodes = [i_0, i_1] + list(set([g.underlying for g in group_0+group_1]))
+        
+        i_0_neigh = set(graph.get_neighbours(Vert(graph, i_0), Vert(graph, i_0).level+1, 'I'))
+        e1_0_neigh = set(graph.get_neighbours(group_0[0], group_0[0].level, 'I'))
+        e2_0_neigh = set(graph.get_neighbours(group_0[1], group_0[1].level, 'I'))
+        e3_0_neigh = set(graph.get_neighbours(group_0[2], group_0[2].level, 'I'))
+        subgraph_nodes += list(e1_0_neigh.intersection(e2_0_neigh).intersection(i_0_neigh)) + list(e2_0_neigh.intersection(e3_0_neigh).intersection(i_0_neigh))
+        i_1_neigh = set(graph.get_neighbours(Vert(graph, i_1), Vert(graph, i_1).level+1, 'I'))
+        e1_1_neigh = set(graph.get_neighbours(group_1[0], group_1[0].level, 'I'))
+        e2_1_neigh = set(graph.get_neighbours(group_1[1], group_1[1].level, 'I'))
+        e3_1_neigh = set(graph.get_neighbours(group_1[2], group_1[2].level, 'I'))
+        subgraph_nodes += list(e1_1_neigh.intersection(e2_1_neigh).intersection(i_1_neigh))
+        subgraph_nodes += list(e2_1_neigh.intersection(e3_1_neigh).intersection(i_1_neigh))
+        
+        template = self.get_template()
+        
+        if not is_isomorphic(graph.subgraph(subgraph_nodes), template):
+            return False
+        
         return True
+    
+    def get_template(self):
+        base_verts = [
+            (0, {"label": "i"}),
+            (1, {"label": "i"}),
+            (2, {"label": "I"}),
+            (3, {"label": "I"}),
+            (4, {"label": "I"}),
+            (5, {"label": "I"}),
+            (6, {"label": "E"}),
+            (7, {"label": "E"}),
+            (8, {"label": "E"}),
+            (9, {"label": "E"}),
+            (10, {"label": "E"}),
+            (11, {"label": "E"}),
+        ]
+        
+        if self.vertices_to_merge > 2:
+            base_verts += [(12, {"label": "E"})]
+            
+        inner_edges = [
+            (0, 11), (1, 11),
+            (0, 2), (0,3), (1,4), (1,5),
+            (2, 9), (3,10), (3,9), (4,7), (5,8), (5,7),
+            (10,9), (8,7)
+        ]
+        
+        if self.vertices_to_merge == 2:
+            inner_edges += [
+                (2, 6), (4,6),
+                (6,9), (6,7)
+            ]
+        else:
+            inner_edges += [
+                (2, 6), (4,12),
+                (6,9), (12,7)
+            ]
+            
+        
+        expected_subgraph = nx.Graph()
+        expected_subgraph.add_nodes_from(base_verts)
+        expected_subgraph.add_edges_from(inner_edges)
+        
+        return expected_subgraph
+        
+        
     
     def find_common_vert(self, group_0, group_1, graph, coord_name):
         for iter in range(len(group_0)):
@@ -123,18 +195,17 @@ class SameCoordsMatcher:
         """
         
         neighs = [master_vert]
-        i = master_i
+        master_i = set(graph.get_i_neighbour(master_vert, master_vert.level))
         for vs in vertices_to_search:
             match = self.check_coord((vs[0].pos_x, vs[0].pos_y), (master_vert.pos_x, master_vert.pos_y), coord_name)
             if match:
-                master_i = set(graph.get_i_neighbour(master_vert, master_vert.level))
                 for v in vs[1:]:
                     v_i = graph.get_i_neighbour(v, v.level)
                     common_i = master_i.intersection(v_i)
                     
                     neighs = neighs + [v] if len(common_i)>0 else neighs
                     
-        return neighs, i
+        return neighs, master_i
 
                     
                     
