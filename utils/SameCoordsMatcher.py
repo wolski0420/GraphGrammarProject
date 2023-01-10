@@ -19,21 +19,23 @@ class SameCoordsMatcher:
         
         for idx, match_verts in enumerate(matching_vertices):
             master_vert = match_verts[0]
-            x_neigh = self.find_coord_neighs(graph, master_vert, 'x', matching_vertices[idx:])
-            y_neigh = self.find_coord_neighs(graph, master_vert, 'y', matching_vertices[idx:])
+            x_neigh, x_i = self.find_coord_neighs(graph, master_vert, 'x', matching_vertices[idx:])
+            y_neigh, y_i = self.find_coord_neighs(graph, master_vert, 'y', matching_vertices[idx:])
             
             if len(x_neigh)==self.vertices_to_merge:
-                oposite_neigh = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices[idx:])
+                oposite_neigh, opos_i = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices[idx:])
                 is_good = self.check_production_predicats(oposite_neigh, x_neigh, 'y')
 
                 # check isomorphic?
-                merge_parts.append((x_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                # merge_parts.append((x_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                merge_parts.append([x_i, opos_i]) if oposite_neigh is not None and is_good else None
             
             if len(y_neigh)==self.vertices_to_merge:
-                oposite_neigh = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx:])
+                oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx:])
                 is_good = self.check_production_predicats(oposite_neigh, y_neigh, 'x')
                 # check isomorphic?
-                merge_parts.append((y_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                # merge_parts.append((y_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                merge_parts.append([y_i, opos_i]) if oposite_neigh is not None and is_good else None
         
         return merge_parts # change to return i_verts
     
@@ -57,11 +59,10 @@ class SameCoordsMatcher:
         return group 
 
     def find_opposite_vert_group(self, graph, vert_group, coord_name, vertices_to_search, matching_vertices):
-        
         for vert in vertices_to_search:
-            potential_group = self.find_coord_neighs(graph, vert, coord_name, matching_vertices)
+            potential_group, pot_i = self.find_coord_neighs(graph, vert, coord_name, matching_vertices)
             if self.compare_vert_groups(vert_group, potential_group):
-                return potential_group
+                return potential_group, pot_i
                 
             
     def compare_vert_groups(self, group_0, group_1):
@@ -86,6 +87,7 @@ class SameCoordsMatcher:
         """
         
         neighs = [master_vert]
+        i = master_i
         for vs in vertices_to_search:
             match = self.check_coord((vs[0].pos_x, vs[0].pos_y), (master_vert.pos_x, master_vert.pos_y), coord_name)
             if match:
@@ -96,7 +98,7 @@ class SameCoordsMatcher:
                     
                     neighs = neighs + [v] if len(common_i)>0 else neighs
                     
-        return neighs
+        return neighs, i
 
                     
                     
