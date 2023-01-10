@@ -27,15 +27,15 @@ class SameCoordsMatcher:
                 is_good = self.check_production_predicats(oposite_neigh, x_neigh, 'y')
 
                 # check isomorphic?
-                # merge_parts.append((x_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
-                merge_parts.append([x_i, opos_i]) if oposite_neigh is not None and is_good else None
+                merge_parts.append((x_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                # merge_parts.append([x_i, opos_i]) if oposite_neigh is not None and is_good else None
             
             if len(y_neigh)==self.vertices_to_merge:
                 oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx:])
                 is_good = self.check_production_predicats(oposite_neigh, y_neigh, 'x')
                 # check isomorphic?
-                # merge_parts.append((y_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
-                merge_parts.append([y_i, opos_i]) if oposite_neigh is not None and is_good else None
+                merge_parts.append((y_neigh, oposite_neigh)) if oposite_neigh is not None and is_good else None
+                # merge_parts.append([y_i, opos_i]) if oposite_neigh is not None and is_good else None
         
         return merge_parts # change to return i_verts
     

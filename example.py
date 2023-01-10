@@ -36,6 +36,11 @@ def test_P7():
         (e4, i3), (e6, i3), (e6, i4), (e5, i4)
     ])
     
+    vis.visualise_graph(graph, center_level=1)
+    graph = P7(graph, [e1,e3,e2], [e4,e6,e5])
+
+    vis.visualise_graph(graph, center_level=1)
+    
     # level = 0
     # base_graph = StandardizedGraph()
     # e1 = base_graph.add_vert(pos_x=-4, pos_y=4, level=level, label="E")
@@ -60,9 +65,7 @@ def test_P7():
     # base_graph = P1(base_graph, i_match[0])
     # base_graph = P3(base_graph, i_match[1])
     # graph = match_P7(graph, )
-    graph = P7(graph, )
-
-    vis.visualise_graph(graph, center_level=1)
+    
 
 def test_P8():
     graph = StandardizedGraph()
