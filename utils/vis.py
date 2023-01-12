@@ -2,9 +2,9 @@ import networkx as nx
 from matplotlib import pyplot as plt
 from collections import defaultdict
 from functools import reduce
+from random import uniform
 
 from utils import StandardizedGraph
-
 
 def _get_color_by_level(level: int):
     match level:
@@ -96,18 +96,42 @@ def visualise_graph(
             for v1 in G
         ]
         equals = [i for i in equals if len(i) > 1]
-        for eq_list in equals:
-            for v in eq_list:
-                X = pos_x_attr[v]
-                Y = pos_y_attr[v]
-                v_neighbours = [i for i in G.neighbors(v) if level_attr[i]]
-                v_diff = [
-                    (_sgn(pos_x_attr[i] - X), _sgn(pos_y_attr[i] - Y))
-                    for i in v_neighbours
-                ]
-                summed = reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]), v_diff)
+
+        all_eq = [i for sublist in equals for i in sublist]
+        remaining = []
+        
+        # print(all_eq)
+        for v in all_eq:
+            X = pos_x_attr[v]
+            Y = pos_y_attr[v]
+            v_neighbours = [i for i in G.neighbors(v) if level_attr[i] == level_attr[v]]
+            v_diff = [
+                (_sgn(pos_x_attr[i] - X), _sgn(pos_y_attr[i] - Y))
+                for i in v_neighbours
+            ]
+            summed = reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]), v_diff) if len(v_diff) > 0 else (0, 0)
+            offset = (_clamp(summed[0]), _clamp(summed[1]))
+            if offset[0] == 0 and offset[1] == 0:
+                if v not in remaining:
+                    remaining.append(v)
+            offset_dict[v] = offset
+        
+        
+        # Relaxation O(N^2) - bit overengineered :(
+        while len(remaining)>0:
+            next_remaining = []
+            for idx in range(len(remaining)):
+                v = remaining[idx]
+                v_neighbours = [offset_dict[i] for i in G.neighbors(v) if level_attr[i] == level_attr[v]]
+                summed = reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]), v_neighbours) if len(v_neighbours) > 0 else (0, 0)
                 offset = (_clamp(summed[0]), _clamp(summed[1]))
+                if offset[0] == 0 and offset[1] == 0:
+                    if idx == len(remaining) - 1:
+                        offset = (uniform(-1, 1), uniform(-1, 1))
+                    else:
+                        next_remaining.append(v)
                 offset_dict[v] = offset
+            remaining = next_remaining
 
     plt.figure(figsize=(width, height), dpi=dpi)
     for (v1, v2) in G.edges():
