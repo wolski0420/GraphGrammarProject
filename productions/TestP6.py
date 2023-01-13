@@ -78,6 +78,48 @@ class TestP6(unittest.TestCase):
 
         self.assertEqual(new_graph, expected_graph)
 
+    def test_match_P6_wrong_label(self):
+        level = 0
+        base_graph = StandardizedGraph()
+        e1 = base_graph.add_vert(pos_x=-4, pos_y=4, level=level, label="F")
+        e2 = base_graph.add_vert(pos_x=4, pos_y=4, level=level, label="E")
+        e3 = base_graph.add_vert(pos_x=4, pos_y=-4, level=level, label="E")
+        e4 = base_graph.add_vert(pos_x=-4, pos_y=-4, level=level, label="E")
+        e5 = base_graph.add_vert(pos_x=-4, pos_y=0, level=level, label="E")
+        e6 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
+        e7 = base_graph.add_vert(pos_x=4, pos_y=0, level=level, label="E")
+        e8 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        i1 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="I")
+        base_graph.add_edges([(e1, e6), (e2, e6), (e2, e7), (e3, e7), (e3, e8), (e8, e4), (e4, e5), (e5, e1)])
+        base_graph.add_edges([(i1, e1), (i1, e2), (i1, e3), (i1, e4)])
+
+        # for debugging
+        # visualise_graph(base_graph, level)
+
+        i_match = match_P6(base_graph, level)
+        self.assertEqual(i_match, [])
+
+    def test_match_P6_missing_edge(self):
+        level = 0
+        base_graph = StandardizedGraph()
+        e1 = base_graph.add_vert(pos_x=-4, pos_y=4, level=level, label="E")
+        e2 = base_graph.add_vert(pos_x=4, pos_y=4, level=level, label="E")
+        e3 = base_graph.add_vert(pos_x=4, pos_y=-4, level=level, label="E")
+        e4 = base_graph.add_vert(pos_x=-4, pos_y=-4, level=level, label="E")
+        e5 = base_graph.add_vert(pos_x=-4, pos_y=0, level=level, label="E")
+        e6 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
+        e7 = base_graph.add_vert(pos_x=4, pos_y=0, level=level, label="E")
+        e8 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        i1 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="I")
+        base_graph.add_edges([(e2, e6), (e2, e7), (e3, e7), (e3, e8), (e8, e4), (e4, e5), (e5, e1)])
+        base_graph.add_edges([(i1, e1), (i1, e2), (i1, e3), (i1, e4)])
+
+        # for debugging
+        # visualise_graph(base_graph, level)
+
+        i_match = match_P6(base_graph, level)
+        self.assertEqual(i_match, [])
+
     def test_match_P6_correct_rotated(self):
         level = 0
         base_graph = StandardizedGraph()
@@ -272,7 +314,7 @@ class TestP6(unittest.TestCase):
         expected_graph.add_edges(
             [(old_e1, old_e6), (old_e6, old_e2), (old_e2, old_e7), (old_e7, old_e3), 
              (old_e3, old_e8), (old_e8, old_e4), (old_e4, old_e5), 
-             (old_e5, old_e1), (old_e9, old_e1), (old_e4, old_e11), (old_e11, old_e9), (old_e9, old_e13), (old_e13, old_e10), (old_e10, old_e12), (old_e12, old_e1)])
+             (old_e5, old_e1), (old_e4, old_e11), (old_e11, old_e9), (old_e9, old_e13), (old_e13, old_e10), (old_e10, old_e12), (old_e12, old_e1)])
         expected_graph.add_edges([(old_i1, old_e1), (old_i1, old_e2), (old_i1, old_e3), (old_i1, old_e4)])
         expected_graph.add_edges([(old_i2, old_e1), (old_i2, old_e4), (old_i2, old_e9), (old_i2, old_e10)])
 
@@ -307,11 +349,10 @@ class TestP6(unittest.TestCase):
         i4 = expected_graph.add_vert(pos_x=-2, pos_y=-2, level=level + 1, label="I")
         expected_graph.add_edges([(i4, e4), (i4, e14), (i4, e34), (i4, e1234), (old_i1, i4)])
 
-        visualise_graph(new_graph, level + 1)
-        visualise_graph(expected_graph, level + 1)
+        # visualise_graph(new_graph, level + 1)
+        # visualise_graph(expected_graph, level + 1)
         
-        # this assertion does not work. visualizations above confirm this test works
-        # self.assertEqual(new_graph, expected_graph)
+        self.assertEqual(new_graph, expected_graph)
 
 
     def test_match_P6_incorrect_too_many_large(self):
