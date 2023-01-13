@@ -3,9 +3,19 @@ from utils.StandardizedGraph import StandardizedGraph, Vert
 
 def P8(graph: StandardizedGraph, v0_group: list, v1_group: list):
 
-    v0 = v0_group[0]
-    v1_vertices = [v0_group[1]] + [v1_group[1]]
-    v2_vertices = [v0_group[2]] + [v1_group[2]]
+    for idx, x in enumerate(v1_group):
+        for z in v0_group:
+            if x==z:
+                v0 = x
+                idx0 = idx
+    # idx0 = v0_group.index(v0)
+    print(idx0)
+    if idx0 == 0:
+        v1_vertices = [v0_group[1]] + [v1_group[1]]
+        v2_vertices = [v0_group[2]] + [v1_group[2]]
+    else:
+        v1_vertices = [v0_group[1]] + [v1_group[1]]
+        v2_vertices = [v0_group[0]] + [v1_group[0]]
 
     v1_0_neigh = (graph.get_neighbours(v1_vertices[0], v1_vertices[0].level(), label="I") +
                   graph.get_neighbours(v1_vertices[0], v1_vertices[0].level(), label="E"))
