@@ -152,19 +152,20 @@ def visualise_graph(
         l = nx.get_node_attributes(G, "level")[vertex]
         if hist and l not in hist:
             continue
-        x = nx.get_node_attributes(G, "pos_x")[vertex]
-        y_pos = nx.get_node_attributes(G, "pos_y")[vertex]
-        y = y_pos + _recenter_by_hist(l, center_level)
-        plt.plot(x, y, marker='o', color=_get_color_by_level(l), markersize=8)
+        x = pos_x_attr[vertex]
+        y = pos_y_attr[vertex] + _recenter_by_hist(l, center_level)
+        plt.plot(
+            x + offset_dict[vertex][0],
+            y + offset_dict[vertex][1],
+            marker="o",
+            color=_get_color_by_level(l),
+            markersize=8,
+        )
         if show_labels or show_position:
-            lbl_x_pos = 0
-            lbl_y_pos = 0.5
-
-            vertexes_in_same_pos = graph.find_by_pos(x, y_pos)
-            
-            if len(vertexes_in_same_pos) > 2 and vertexes_in_same_pos[2].underlying == vertex:
-                lbl_x_pos = 0 #0.5
-                lbl_y_pos = -1 #1
-
-            plt.text(x + lbl_x_pos, y + lbl_y_pos, _get_node_text(G, vertex, show_labels, show_position))
+            plt.text(
+                x + offset_dict[vertex][0] + 0.5,
+                y + offset_dict[vertex][1] + 1,
+                _get_node_text(G, vertex, show_labels, show_position),
+            )
+            # plt.text(x + 0.5, y + 1, vertex)
     plt.show()

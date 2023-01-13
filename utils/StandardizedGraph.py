@@ -84,11 +84,3 @@ class StandardizedGraph:
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
-    def find_by_pos(self, pos_x: float, pos_y:float):
-
-        return [Vert(self.underlying, v) for v in list(filter(
-            lambda node: nx.get_node_attributes(self.underlying, "pos_x")[node] == pos_x and
-                          nx.get_node_attributes(self.underlying, "pos_y")[node] == pos_y,
-            self.underlying.nodes
-        ))]
