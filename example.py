@@ -227,8 +227,9 @@ def ex_B():
 
     groups_P11 = match_P11(graph, level)
     groups_P7 = match_P7(graph, level)
-    print(groups_P7)
+
     graph = P11(graph, groups_P11[0][0], groups_P11[0][1])
+    graph = P7(graph, groups_P7[0][0], groups_P7[0][1])
     level += 1
     vis.visualise_graph(graph)
 
