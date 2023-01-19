@@ -70,41 +70,19 @@ class SameCoordsMatcherOneEdgeBroken:
                             self.directly_connected(graph.underlying, vert1.underlying, vert) and \
                             self.directly_connected(graph.underlying, vert2.underlying, vert):
                                 for k in range(len(first_group)):
-                                    vert3 = first_group[k]
-                                    for l in range(len(second_group)):
-                                        vert4 = second_group[l]
-
-                                        if self.directly_connected(graph.underlying, vert3.underlying, vert4.underlying):
-                                            return [([vert1, vert3], [vert2, vert4])]
-
-        # tmp = first_group
-        # first_group = second_group
-        # second_group = tmp
-        # for i in range(len(first_group)):
-        #     vert1 = first_group[i]
-        #     for j in range(len(second_group)):
-        #         vert2 = second_group[j]
-        #         vert1_neighs = set(graph.get_neighbours(vert1, vert1.level(), "E"))
-        #         vert2_neighs = set(graph.get_neighbours(vert2, vert2.level(), "E"))
-
-        #         # print("vert1_neighs: ", vert1_neighs)
-
-        #         if len(vert1_neighs.intersection(vert2_neighs)) > 0:
-        #             # print("vert1_neighs.intersection(vert2_neighs): ", vert1_neighs.intersection(vert2_neighs))
-        #             for vert in vert1_neighs.intersection(vert2_neighs):
-        #                 if (vert1.pos_x() + vert2.pos_x()) / 2 == \
-        #                         nx.get_node_attributes(graph.underlying, "pos_x")[vert] and \
-        #                     (vert1.pos_y() + vert2.pos_y()) / 2 == \
-        #                         nx.get_node_attributes(graph.underlying, "pos_y")[vert] and \
-        #                     self.directly_connected(graph.underlying, vert1.underlying, vert) and \
-        #                     self.directly_connected(graph.underlying, vert2.underlying, vert):
-        #                         for k in range(len(first_group)):
-        #                             vert3 = first_group[k]
-        #                             for l in range(len(second_group)):
-        #                                 vert4 = second_group[l]
-
-        #                                 if self.directly_connected(graph.underlying, vert3.underlying, vert4.underlying):
-        #                                     return [(first_group, second_group)]
+                                    if k != i:
+                                        vert3 = first_group[k]
+                                        for l in range(len(second_group)):
+                                            if l != j:
+                                                vert4 = second_group[l]
+                                                if self.directly_connected(graph.underlying, vert3.underlying, vert4.underlying) and \
+                                                    not self.directly_connected(graph.underlying, vert1.underlying, vert3.underlying) and \
+                                                        not self.directly_connected(graph.underlying, vert2.underlying, vert4.underlying) and \
+                                                            not self.directly_connected(graph.underlying, vert1.underlying, vert4.underlying) and \
+                                                                not self.directly_connected(graph.underlying, vert2.underlying, vert3.underlying) and \
+                                                                    not self.directly_connected(graph.underlying, vert3.underlying, vert) and \
+                                                                        not self.directly_connected(graph.underlying, vert4.underlying, vert):
+                                                                            return [([vert1, vert3], [vert2, vert4])]
 
         return []
                         
