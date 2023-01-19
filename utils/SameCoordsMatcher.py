@@ -64,8 +64,8 @@ class SameCoordsMatcher:
 
         if self.vertices_to_merge==2:
             common_vert = self.find_common_vert(group_0, group_1, graph, coord_name)
-            group_0 += [common_vert] if common_vert is not None else []
-            group_1 += [common_vert] if common_vert is not None else []
+            group_0 += common_vert
+            group_1 += common_vert
 
             group_0 = self.sort_verts(group_0, coord_name)
             group_1 = self.sort_verts(group_1, coord_name)
@@ -170,18 +170,22 @@ class SameCoordsMatcher:
 
 
     def find_common_vert(self, group_0, group_1, graph, coord_name):
+        common_list = []
         for iter in range(len(group_0)):
             neighs_0 = set(graph.get_neighbours(group_0[iter], group_0[iter].level(), 'E'))
             neighs_1 = set(graph.get_neighbours(group_1[iter], group_0[iter].level(), 'E'))
-            common = neighs_0.intersection(neighs_1)
-            
-            if len(common) > 0:
-                idx = list(common)[0]
+            common_list += list(neighs_0.intersection(neighs_1))
+
+        good_common = []
+        if len(common_list) > 0:
+            for idx in set(common_list):
+                print(idx)
                 common = Vert(graph.underlying, idx)
                 is_good = True if (coord_name =='y' and common.pos_x() == group_0[0].pos_x() ) or \
-                                (coord_name =='x' and common.pos_y() == group_0[0].pos_y() ) else False
-                    
-                if is_good: return common
+                            (coord_name =='x' and common.pos_y() == group_0[0].pos_y() ) else False
+
+                if is_good: good_common.append(common)
+        return good_common
                 
         
     
