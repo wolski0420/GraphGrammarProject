@@ -68,6 +68,23 @@ class StandardizedGraph:
 
     # add your methods here
 
+    def remove_vertex(self, v: Vert):
+        self.underlying.remove_node(v.underlying)
+
+    def find_by_pos(self, pos_x: float, pos_y:float):
+        """
+            returns all vertexes which has given position
+        """
+        return [Vert(self.underlying, v) for v in list(filter(
+            lambda node: nx.get_node_attributes(self.underlying, "pos_x")[node] == pos_x and
+                          nx.get_node_attributes(self.underlying, "pos_y")[node] == pos_y,
+            self.underlying.nodes
+        ))]
+
+    def get_edges(self, v: Vert):
+        return list(self.underlying.edges(v.underlying))
+
+
     def get_neighbours(self, v: Vert, level: int, label: str):
         """
         get list of neighbours of v on selected level
@@ -77,6 +94,14 @@ class StandardizedGraph:
                           nx.get_node_attributes(self.underlying, "label")[neigh] == label,
             self.underlying.neighbors(v.underlying)
         ))
+        
+    def get_i_neighbours(self, v:Vert, level:int): #level is level of vert
+        I_neighs = self.get_neighbours(v, level, 'I')
+        i_neighs = []
+        for I in I_neighs:
+            i_neighs += self.get_neighbours(Vert(self.underlying, I), level-1, 'i')
+        
+        return i_neighs
 
     def __eq__(self, other):
         return isinstance(other, StandardizedGraph) \

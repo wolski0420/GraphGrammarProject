@@ -1,7 +1,7 @@
 import unittest
 from utils.vis import visualise_graph
 from utils.StandardizedGraph import StandardizedGraph, Vert
-from .P6 import match_P6, P6
+from productions.P6 import match_P6, P6
 
 class TestP6(unittest.TestCase):
     def test_match_P6_correct(self):
