@@ -30,7 +30,7 @@ class SameCoordsMatcher:
                     group_0 = self.sort_verts(x_neigh, 'y')
                     group_1 = self.sort_verts(oposite_neigh, 'y')
                     group_00, group_11 = self.add_vert_if_needed(group_0, group_1, 'y', graph)
-                    for idxg in range(len(group_0)+1-self.vertices_to_merge):
+                    for idxg in range(len(group_00)+1-3):
                         group_0 = group_00[idxg:idxg+3]
                         group_1 = group_11[idxg:idxg + 3]
 
@@ -46,7 +46,7 @@ class SameCoordsMatcher:
                     group_0 = self.sort_verts(y_neigh, 'x')
                     group_1 = self.sort_verts(oposite_neigh, 'x')
                     group_00, group_11 = self.add_vert_if_needed(group_0, group_1, 'x', graph)
-                    for idxg in range(len(group_0) + 1 - self.vertices_to_merge):
+                    for idxg in range(len(group_00) + 1 - 3):
                         group_0 = group_00[idxg:idxg + 3]
                         group_1 = group_11[idxg:idxg + 3]
 
@@ -64,8 +64,8 @@ class SameCoordsMatcher:
 
         if self.vertices_to_merge==2:
             common_vert = self.find_common_vert(group_0, group_1, graph, coord_name)
-            group_0 += [common_vert]
-            group_1 += [common_vert]
+            group_0 += [common_vert] if common_vert is not None else []
+            group_1 += [common_vert] if common_vert is not None else []
 
             group_0 = self.sort_verts(group_0, coord_name)
             group_1 = self.sort_verts(group_1, coord_name)
@@ -225,11 +225,12 @@ class SameCoordsMatcher:
             match = self.check_coord((vs[0].pos_x(), vs[0].pos_y()), (master_vert.pos_x(), master_vert.pos_y()), coord_name)
             if match:
                 for v in vs:
-                    v_i = graph.get_i_neighbours(v, v.level())
-                    common_i = master_i.intersection(v_i)
-                    
-                    neighs = neighs + [v] if len(common_i)>0 else neighs
-                    
+                    if v.underlying != master_vert.underlying:
+                        v_i = graph.get_i_neighbours(v, v.level())
+                        common_i = master_i.intersection(v_i)
+
+                        neighs = neighs + [v] if len(common_i)>0 else neighs
+
         return neighs, master_i
 
                     
