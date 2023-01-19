@@ -1,3 +1,4 @@
+from itertools import combinations
 from utils.StandardizedGraph import StandardizedGraph, Vert
 import networkx as nx
 from networkx.algorithms.isomorphism import is_isomorphic
@@ -5,7 +6,7 @@ from networkx.algorithms.isomorphism import is_isomorphic
 from utils.vis import visualise_graph
 
 
-class SameCoordsMatcher:
+class SameCoordsMatcherOneEdgeBroken:
     def __init__(self, vertices_to_merge) -> None:
 
         self.vertices_to_merge = vertices_to_merge
@@ -13,37 +14,103 @@ class SameCoordsMatcher:
     def match(self, graph: StandardizedGraph, level:int):
         self.level = level
         matching_vertices = self.find_all_matching_vertices(graph, level)
-        # print(matching_vertices)
+        # print("matching coords: ", matching_vertices)
      
         return self.find_matching_groups(graph, matching_vertices)
         
     def find_matching_groups(self, graph, matching_vertices):
         merge_parts = []
         
-        for idx, match_verts in enumerate(matching_vertices):
-            master_vert = match_verts[0]
-            x_neigh, x_i = self.find_coord_neighs(graph, master_vert, 'x', matching_vertices[idx+1:])
-            y_neigh, y_i = self.find_coord_neighs(graph, master_vert, 'y', matching_vertices[idx+1:])
-            
-            if len(x_neigh)==self.vertices_to_merge:
-                oposite_neigh, opos_i = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices[idx+1:])
-                if oposite_neigh is not None:
-                    group_0, group_1 = self.add_vert_if_needed(x_neigh, oposite_neigh, 'y', graph)
-                    is_good = self.check_production_predicats(group_0, group_1, x_i, opos_i, 'y', graph)
+        for matching_vertices_combination in combinations(matching_vertices, 2):
+            merge_parts.extend(self.find_matching_groups_for_combination(graph, matching_vertices_combination))
 
-                    merge_parts.append((group_0, group_1)) if is_good else None
-                # merge_parts.append([x_i, opos_i]) if oposite_neigh is not None and is_good else None
+        # for idx, match_verts in enumerate(matching_vertices):
+        #     master_vert = match_verts[0]
+        #     x_neigh, x_i = self.find_coord_neighs(graph, master_vert, 'x', matching_vertices[idx+1:])
+        #     y_neigh, y_i = self.find_coord_neighs(graph, master_vert, 'y', matching_vertices[idx+1:])
             
-            if len(y_neigh)==self.vertices_to_merge:
-                oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx+1:])
-                if oposite_neigh is not None:
-                    group_0, group_1 = self.add_vert_if_needed(y_neigh, oposite_neigh, 'x', graph)
-                    is_good = self.check_production_predicats(group_0, group_1, y_i, opos_i, 'x', graph)
-                    merge_parts.append((group_0, group_1)) if is_good else None
-                    # merge_parts.append([y_i, opos_i]) if oposite_neigh is not None and is_good else None
+            # if len(x_neigh)==self.vertices_to_merge:
+            #     oposite_neigh, opos_i = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices[idx+1:])
+            #     if oposite_neigh is not None:
+            #         group_0, group_1 = self.add_vert_if_needed(x_neigh, oposite_neigh, 'y', graph)
+            #         is_good = self.check_production_predicats(group_0, group_1, x_i, opos_i, 'y', graph)
+
+            #         merge_parts.append((group_0, group_1)) if is_good else None
+            #     # merge_parts.append([x_i, opos_i]) if oposite_neigh is not None and is_good else None
+            
+            # if len(y_neigh)==self.vertices_to_merge:
+            #     oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices[idx+1:])
+            #     if oposite_neigh is not None:
+            #         group_0, group_1 = self.add_vert_if_needed(y_neigh, oposite_neigh, 'x', graph)
+            #         is_good = self.check_production_predicats(group_0, group_1, y_i, opos_i, 'x', graph)
+            #         merge_parts.append((group_0, group_1)) if is_good else None
+            #         # merge_parts.append([y_i, opos_i]) if oposite_neigh is not None and is_good else None
         
         return merge_parts # change to return i_verts
     
+    def find_matching_groups_for_combination(self, graph, matching_vertices_combination):
+        first_group = matching_vertices_combination[0]
+        second_group = matching_vertices_combination[1]
+        for i in range(len(first_group)):
+            vert1 = first_group[i]
+            for j in range(len(second_group)):
+                vert2 = second_group[j]
+                vert1_neighs = set(graph.get_neighbours(vert1, vert1.level(), "E"))
+                vert2_neighs = set(graph.get_neighbours(vert2, vert2.level(), "E"))
+
+                # print("vert1_neighs: ", vert1_neighs)
+
+                if len(vert1_neighs.intersection(vert2_neighs)) > 0:
+                    # print("vert1_neighs.intersection(vert2_neighs): ", vert1_neighs.intersection(vert2_neighs))
+                    for vert in vert1_neighs.intersection(vert2_neighs):
+                        if (vert1.pos_x() + vert2.pos_x()) / 2 == \
+                                nx.get_node_attributes(graph.underlying, "pos_x")[vert] and \
+                            (vert1.pos_y() + vert2.pos_y()) / 2 == \
+                                nx.get_node_attributes(graph.underlying, "pos_y")[vert] and \
+                            self.directly_connected(graph.underlying, vert1.underlying, vert) and \
+                            self.directly_connected(graph.underlying, vert2.underlying, vert):
+                                for k in range(len(first_group)):
+                                    vert3 = first_group[k]
+                                    for l in range(len(second_group)):
+                                        vert4 = second_group[l]
+
+                                        if self.directly_connected(graph.underlying, vert3.underlying, vert4.underlying):
+                                            return [([vert1, vert3], [vert2, vert4])]
+
+        # tmp = first_group
+        # first_group = second_group
+        # second_group = tmp
+        # for i in range(len(first_group)):
+        #     vert1 = first_group[i]
+        #     for j in range(len(second_group)):
+        #         vert2 = second_group[j]
+        #         vert1_neighs = set(graph.get_neighbours(vert1, vert1.level(), "E"))
+        #         vert2_neighs = set(graph.get_neighbours(vert2, vert2.level(), "E"))
+
+        #         # print("vert1_neighs: ", vert1_neighs)
+
+        #         if len(vert1_neighs.intersection(vert2_neighs)) > 0:
+        #             # print("vert1_neighs.intersection(vert2_neighs): ", vert1_neighs.intersection(vert2_neighs))
+        #             for vert in vert1_neighs.intersection(vert2_neighs):
+        #                 if (vert1.pos_x() + vert2.pos_x()) / 2 == \
+        #                         nx.get_node_attributes(graph.underlying, "pos_x")[vert] and \
+        #                     (vert1.pos_y() + vert2.pos_y()) / 2 == \
+        #                         nx.get_node_attributes(graph.underlying, "pos_y")[vert] and \
+        #                     self.directly_connected(graph.underlying, vert1.underlying, vert) and \
+        #                     self.directly_connected(graph.underlying, vert2.underlying, vert):
+        #                         for k in range(len(first_group)):
+        #                             vert3 = first_group[k]
+        #                             for l in range(len(second_group)):
+        #                                 vert4 = second_group[l]
+
+        #                                 if self.directly_connected(graph.underlying, vert3.underlying, vert4.underlying):
+        #                                     return [(first_group, second_group)]
+
+        return []
+                        
+    def directly_connected(self, graph, e1, e2):
+        return e2 in graph.neighbors(e1)
+
     def add_vert_if_needed(self, group_0, group_1, coord_name, graph):
         group_0 = self.sort_verts(group_0, coord_name)
         group_1 = self.sort_verts(group_1, coord_name)
@@ -100,8 +167,6 @@ class SameCoordsMatcher:
         e3_1_neigh = set(graph.get_neighbours(group_1[2], group_1[2].level(), 'I'))
         subgraph_nodes += list(e1_1_neigh.intersection(e2_1_neigh).intersection(i_1_neigh))
         subgraph_nodes += list(e2_1_neigh.intersection(e3_1_neigh).intersection(i_1_neigh))
-
-        print('check production predicats')
         
         template = self.get_template()
         # visualise_graph(template, self.level)
@@ -210,6 +275,7 @@ class SameCoordsMatcher:
         
         neighs = [master_vert]
         master_i = set(graph.get_i_neighbours(master_vert, master_vert.level()))
+
         for vs in vertices_to_search:
             match = self.check_coord((vs[0].pos_x(), vs[0].pos_y()), (master_vert.pos_x(), master_vert.pos_y()), coord_name)
             if match:
