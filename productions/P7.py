@@ -8,6 +8,8 @@ def P7(graph: StandardizedGraph, v0_group: list, v1_group: list):
     v1_vertices = [v0_group[1]] + [v1_group[1]]
     v2_vertices = [v0_group[2]] + [v1_group[2]]
 
+
+
     # find neighbours of one vertex on each position
     v0_0_neigh = (graph.get_neighbours(v0_vertices[0], v0_vertices[0].level(), label = "I") +
                  graph.get_neighbours(v0_vertices[0], v0_vertices[0].level(), label = "E"))

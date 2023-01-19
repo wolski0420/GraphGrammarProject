@@ -137,5 +137,5 @@ def test_P8():
 
 
 if __name__ == "__main__":
-    # test_P7()
-    test_P8()
+    test_P7()
+    # test_P8()
