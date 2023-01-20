@@ -59,7 +59,6 @@ def step6(graph: StandardizedGraph) -> StandardizedGraph:
     return graph
 
 def step7(graph: StandardizedGraph) -> StandardizedGraph:
-    print(graph)
     prod_left_side = match_P12(graph, level=3)[0]
     return P12(graph, prod_left_side)
 
@@ -68,7 +67,7 @@ def task_B():
     graph = StandardizedGraph()
     graph.add_vert(0, 0, "El", level)
 
-    # visualise_graph(graph, center_level=0, hist=[0])
+    visualise_graph(graph, center_level=0, hist=[0])
 
     steps = [step1, step2, step3, step4, step5, step6, step7]
 
