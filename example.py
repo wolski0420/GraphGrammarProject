@@ -185,8 +185,8 @@ def test_P12():
     # for debugging
     vis.visualise_graph(base_graph, level)
 
-    i_match0, i_match1 = match_P12(base_graph, level)[0]
-    new_graph = P12(base_graph, i_match0, i_match1)
+    matched = match_P12(base_graph, level)[0]
+    new_graph = P12(base_graph, matched)
 
     vis.visualise_graph(new_graph, level)
 

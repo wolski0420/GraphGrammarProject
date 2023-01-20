@@ -37,26 +37,28 @@ class P12_E_Verts():
 
     def is_valid(self):
         #TODO (na kazdym etapie szukania jak jest None to ma zwrocic false)
-        i_left_top = self.get_common_neigh(self.e_top, self.e_left_middle, "I")
-        i_left_down = self.get_common_neigh(self.e_left_middle, self.e_left_down, "I")
-        i_right = self.get_common_neigh(self.e_right, self.e_top, "I")
+        i_left_top = self.get_common_neigh(self.e_top, self.e_left_middle, ["I", "i"])
+        i_left_down = self.get_common_neigh(self.e_left_middle, self.e_left_down, ["I", "i"])
+        i_right = self.get_common_neigh(self.e_right, self.e_top, ["I", "i"])
 
-        i_orange_left = self.get_common_neigh(i_left_top, i_left_down, "i")
-        i_orange_right = self.get_neigh(i_right, "i")[0]
+        i_orange_left = self.get_common_neigh(i_left_top, i_left_down, ["I", "i"])
+        i_orange_right = self.get_neigh(i_right, ["I", "i"])[0]
         
-        e_top = self.get_common_neigh(i_orange_right, i_orange_left, "E")
+        e_top = self.get_common_neigh(i_orange_right, i_orange_left, ["E"])
+        print(self.coords(e_top))
         return e_top is not None
 
-    def get_common_neigh(self, v1, v2, label: str):
-        for i_vert in self.graph.find_by_label(label):
-            i_neighbors = self.graph.underlying.neighbors(i_vert.underlying) 
-            if v1 in i_neighbors and v2 in i_neighbors:
-                return i_vert.underlying
+    def get_common_neigh(self, v1, v2, labels):
+        for label in labels:
+            for i_vert in self.graph.find_by_label(label):
+                i_neighbors = list(self.graph.underlying.neighbors(i_vert.underlying)) 
+                if v1 in i_neighbors and v2 in i_neighbors:
+                    return i_vert.underlying
         return None
     
-    def get_neigh(self, v1, label: str):
+    def get_neigh(self, v1, labels: str):
         return list(filter(
-            lambda n: nx.get_node_attributes(self.graph.underlying, "label")[n] == label,
+            lambda n: nx.get_node_attributes(self.graph.underlying, "label")[n] in labels,
             self.graph.underlying.neighbors(v1)
         ))
 
