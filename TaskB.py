@@ -5,6 +5,7 @@ from productions.P2 import match_P2, P2
 from productions.P7 import match_P7, P7
 from productions.P10 import match_P10, P10
 from productions.P11 import match_P11, P11
+from productions.P12 import match_P12, P12
 
 
 # TODO: implement P12
@@ -57,15 +58,19 @@ def step6(graph: StandardizedGraph) -> StandardizedGraph:
     # return P7(graph, matched_P11_0, matched_P11_1)
     return graph
 
+def step7(graph: StandardizedGraph) -> StandardizedGraph:
+    print(graph)
+    prod_left_side = match_P12(graph, level=3)[0]
+    return P12(graph, prod_left_side)
 
 def task_B():
     level = 0
     graph = StandardizedGraph()
     graph.add_vert(0, 0, "El", level)
 
-    visualise_graph(graph, center_level=0, hist=[0])
+    # visualise_graph(graph, center_level=0, hist=[0])
 
-    steps = [step1, step2, step3, step4, step5, step6]
+    steps = [step1, step2, step3, step4, step5, step6, step7]
 
     for i, step in enumerate(steps):
         level = min(i, 3)
@@ -76,7 +81,6 @@ def task_B():
             width=max(8, 8 + 2 * (level - 1)),
             dpi=max(80, 80 + 20 * (level - 1))
         )
-
 
 if __name__ == "__main__":
     task_B()
