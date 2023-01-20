@@ -1,4 +1,5 @@
 import networkx as nx
+from productions.P12 import P12, match_P12
 from productions.P11 import P11, match_P11
 from productions.P10 import P10, match_P10
 import utils.vis as vis
@@ -162,6 +163,33 @@ def test_P11():
 
     vis.visualise_graph(new_graph, level)
 
+def test_P12():
+    level = 0
+    pevel_prev = level - 1
+    base_graph = StandardizedGraph()
+    i1 = base_graph.add_vert(pos_x=-4, pos_y=0, level=pevel_prev, label="i")
+    i2 = base_graph.add_vert(pos_x=4, pos_y=0, level=pevel_prev, label="i")
+    I1 = base_graph.add_vert(pos_x=-2, pos_y=2, level=level, label="I")
+    I2 = base_graph.add_vert(pos_x=-2, pos_y=-2, level=level, label="I")
+    I3 = base_graph.add_vert(pos_x=4, pos_y=0, level=level, label="I")
+    e1 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
+    e2 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
+    e3 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+    e6 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+    e7 = base_graph.add_vert(pos_x=0, pos_y=4, level=pevel_prev, label="E")
+    base_graph.add_edges([(i1, I1), (i1, I2), (i2, I3)])
+    base_graph.add_edges([(I1, e1), (I1, e2), (I2, e2), (I2, e3), (I3, e1), (I3, e6)])
+    base_graph.add_edges([(e1, e2), (e2, e3), (e1, e6)])
+    base_graph.add_edges([(e7, i1), (e7,i2)])
+
+    # for debugging
+    vis.visualise_graph(base_graph, level)
+
+    matched = match_P12(base_graph, level)[0]
+    new_graph = P12(base_graph, matched)
+
+    vis.visualise_graph(new_graph, level)
+
 def p4_1():
     graph = StandardizedGraph()
     i = graph.add_vert(pos_x = 0, pos_y = 0, level = 0, label="I")
@@ -286,8 +314,8 @@ if __name__ == "__main__":
 
     # # print(nx.is_isomorphic(subgraph, similar))
     # vis.visualise_graph(graph, center_level=1)
-    # test_P11()
-    ex_B()
+    test_P12()
+    # ex_B()
 
 
 
