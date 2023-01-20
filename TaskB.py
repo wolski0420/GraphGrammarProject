@@ -1,4 +1,4 @@
-from utils.StandardizedGraph import StandardizedGraph
+from utils.StandardizedGraph import StandardizedGraph, Vert
 from utils.vis import visualise_graph
 from productions.P1 import match_P1, P1
 from productions.P2 import match_P2, P2
@@ -7,9 +7,6 @@ from productions.P10 import match_P10, P10
 from productions.P11 import match_P11, P11
 from productions.P12 import match_P12, P12
 
-
-# TODO: implement P12
-# from productions.P12 import match_P12, P12
 
 def step1(graph: StandardizedGraph) -> StandardizedGraph:
     matched = match_P1(graph)
@@ -31,14 +28,15 @@ def step3(graph: StandardizedGraph) -> StandardizedGraph:
     return P10(graph, matched_P10[0])
 
 
-# TODO: finish when P11 is available
 def step4(graph: StandardizedGraph) -> StandardizedGraph:
     matched_P7 = match_P7(graph, level=3)
     matched_P11 = match_P11(graph, level=3)
-    matched_P7 = list(filter(
-        lambda verts: all(vert.pos_y() == 0 for vert in verts[0]) and all(vert.pos_y() == 0 for vert in verts[1]),
-        matched_P7)
-    )
+
+    def on_x_axis(verts: tuple[list[Vert], list[Vert]]) -> bool:
+        return all(vert.pos_y() == 0 for vert in verts[0]) and all(vert.pos_y() == 0 for vert in verts[1])
+
+    matched_P7 = list(filter(on_x_axis, matched_P7))
+    matched_P11 = list(filter(on_x_axis, matched_P11))
     matched_P7_0, matched_P7_1 = matched_P7[0]
     matched_P11_0, matched_P11_1 = matched_P11[0]
     new_graph = P7(graph, matched_P7_0, matched_P7_1)
@@ -51,16 +49,10 @@ def step5(graph: StandardizedGraph) -> StandardizedGraph:
     return P7(graph, matched_P7_0, matched_P7_1)
 
 
-# TODO: implement when P11 is available
 def step6(graph: StandardizedGraph) -> StandardizedGraph:
-    # matched_P11 = match_P11(graph, level=3)
-    # matched_P11_0, matched_P11_1 = matched_P11[0]
-    # return P7(graph, matched_P11_0, matched_P11_1)
-    return graph
-
-def step7(graph: StandardizedGraph) -> StandardizedGraph:
     prod_left_side = match_P12(graph, level=3)[0]
     return P12(graph, prod_left_side)
+
 
 def task_B():
     level = 0
@@ -69,7 +61,7 @@ def task_B():
 
     visualise_graph(graph, center_level=0, hist=[0])
 
-    steps = [step1, step2, step3, step4, step5, step6, step7]
+    steps = [step1, step2, step3, step4, step5, step6]
 
     for i, step in enumerate(steps):
         level = min(i, 3)
@@ -80,6 +72,7 @@ def task_B():
             width=max(8, 8 + 2 * (level - 1)),
             dpi=max(80, 80 + 20 * (level - 1))
         )
+
 
 if __name__ == "__main__":
     task_B()
