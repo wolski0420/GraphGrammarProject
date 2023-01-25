@@ -7,7 +7,6 @@ from utils.vis import visualise_graph
 
 class SameCoordsMatcher:
     def __init__(self, vertices_to_merge) -> None:
-
         self.vertices_to_merge = vertices_to_merge
     
     def match(self, graph: StandardizedGraph, level:int):

@@ -149,6 +149,44 @@ class TestP4(unittest.TestCase):
 
         self.assertEqual(new_graph, expected_graph)
 
+    def test_match_P4_incorrect_missing_edge(self):
+        level = 0
+        base_graph = StandardizedGraph()
+        e1 = base_graph.add_vert(pos_x=-4, pos_y=4, level=level, label="E")
+        e2 = base_graph.add_vert(pos_x=4, pos_y=4, level=level, label="E")
+        e3 = base_graph.add_vert(pos_x=4, pos_y=-4, level=level, label="E")
+        e4 = base_graph.add_vert(pos_x=-4, pos_y=-4, level=level, label="E")
+        e12 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
+        e14 = base_graph.add_vert(pos_x=-4, pos_y=0, level=level, label="E")
+        i1 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="I")
+        base_graph.add_edges([(e1, e12), (e12, e2), (e3, e4), (e4, e14), (e14, e1)])
+        base_graph.add_edges([(i1, e1), (i1, e2), (i1, e3), (i1, e4)])
+
+        # for debugging
+        # visualise_graph(base_graph, level)
+
+        i_match = match_P4(base_graph, level)
+        self.assertEqual(i_match, [])
+
+    def test_match_P4_incorrect_label(self):
+        level = 0
+        base_graph = StandardizedGraph()
+        e1 = base_graph.add_vert(pos_x=-4, pos_y=4, level=level, label="E")
+        e2 = base_graph.add_vert(pos_x=4, pos_y=4, level=level, label="E")
+        e3 = base_graph.add_vert(pos_x=4, pos_y=-4, level=level, label="E")
+        e4 = base_graph.add_vert(pos_x=-4, pos_y=-4, level=level, label="E")
+        e12 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="x")
+        e14 = base_graph.add_vert(pos_x=-4, pos_y=0, level=level, label="E")
+        i1 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="I")
+        base_graph.add_edges([(e1, e12), (e12, e2), (e2, e3), (e3, e4), (e4, e14), (e14, e1)])
+        base_graph.add_edges([(i1, e1), (i1, e2), (i1, e3), (i1, e4)])
+
+        # for debugging
+        # visualise_graph(base_graph, level)
+
+        i_match = match_P4(base_graph, level)
+        self.assertEqual(i_match, [])
+
     def test_match_P4_incorrect_pos(self):
         level = 0
         base_graph = StandardizedGraph()

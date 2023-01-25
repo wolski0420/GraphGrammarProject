@@ -17,7 +17,7 @@ class TestP8(unittest.TestCase):
         I4 = base_graph.add_vert(pos_x=2, pos_y=-2, level=level, label="I")
         e1 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
         e2 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
-        e3 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        e3 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="I")
         e5 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
         e6 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
         base_graph.add_edges([(i1, I1), (i1, I2), (i2, I3), (i2, I4)])
