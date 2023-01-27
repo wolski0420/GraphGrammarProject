@@ -96,11 +96,19 @@ class StandardizedGraph:
         ))
         
     def get_i_neighbours(self, v:Vert, level:int): #level is level of vert
-        I_neighs = self.get_neighbours(v, level, 'I')
+        I_neighs = self.get_neighbours(v, level, 'I') #+self.get_neighbours(v, level, 'i')
         i_neighs = []
         for I in I_neighs:
             i_neighs += self.get_neighbours(Vert(self.underlying, I), level-1, 'i')
         
+        return i_neighs
+
+    def get_ii_neighbours(self, v: Vert, level: int):  # level is level of vert
+        I_neighs = self.get_neighbours(v, level, 'i')
+        i_neighs = []
+        for I in I_neighs:
+            i_neighs += self.get_neighbours(Vert(self.underlying, I), level - 1, 'i')
+
         return i_neighs
 
     def __eq__(self, other):

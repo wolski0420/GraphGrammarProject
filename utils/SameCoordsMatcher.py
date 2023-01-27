@@ -1,12 +1,14 @@
 from utils.StandardizedGraph import StandardizedGraph, Vert
 import networkx as nx
 from networkx.algorithms.isomorphism import is_isomorphic
+from matplotlib import pyplot as plt
 
 from utils.vis import visualise_graph
 
 
 class SameCoordsMatcher:
-    def __init__(self, vertices_to_merge) -> None:
+    def __init__(self, same_coords_vertices, vertices_to_merge=3) -> None:
+        self.same_coords_vertices = same_coords_vertices
         self.vertices_to_merge = vertices_to_merge
     
     def match(self, graph: StandardizedGraph, level:int):
@@ -23,15 +25,15 @@ class SameCoordsMatcher:
             x_neigh, x_i = self.find_coord_neighs(graph, master_vert, 'x', matching_vertices)
             y_neigh, y_i = self.find_coord_neighs(graph, master_vert, 'y', matching_vertices)
 
-            if len(x_neigh)>=self.vertices_to_merge:
+            if len(x_neigh)>=self.same_coords_vertices:
                 oposite_neigh, opos_i = self.find_opposite_vert_group(graph, x_neigh, 'x', match_verts[1:], matching_vertices)
                 if oposite_neigh is not None:
                     group_0 = self.sort_verts(x_neigh, 'y')
                     group_1 = self.sort_verts(oposite_neigh, 'y')
                     group_00, group_11 = self.add_vert_if_needed(group_0, group_1, 'y', graph)
-                    for idxg in range(len(group_00)+1-3):
-                        group_0 = group_00[idxg:idxg+3]
-                        group_1 = group_11[idxg:idxg + 3]
+                    for idxg in range(len(group_00)+1-self.vertices_to_merge):
+                        group_0 = group_00[idxg:idxg + self.vertices_to_merge]
+                        group_1 = group_11[idxg:idxg + self.vertices_to_merge]
 
                         is_good = self.check_production_predicats(group_0, group_1, x_i, opos_i, 'y', graph)
 
@@ -39,15 +41,15 @@ class SameCoordsMatcher:
                                                                   and (group_0, group_1) not in merge_parts \
                                                                   and (group_1, group_0) not in merge_parts else None
 
-            if len(y_neigh)>=self.vertices_to_merge:
+            if len(y_neigh)>=self.same_coords_vertices:
                 oposite_neigh, opos_i = self.find_opposite_vert_group(graph, y_neigh, 'y', match_verts[1:], matching_vertices)
                 if oposite_neigh is not None:
                     group_0 = self.sort_verts(y_neigh, 'x')
                     group_1 = self.sort_verts(oposite_neigh, 'x')
                     group_00, group_11 = self.add_vert_if_needed(group_0, group_1, 'x', graph)
-                    for idxg in range(len(group_00) + 1 - 3):
-                        group_0 = group_00[idxg:idxg + 3]
-                        group_1 = group_11[idxg:idxg + 3]
+                    for idxg in range(len(group_00) + 1 - self.vertices_to_merge):
+                        group_0 = group_00[idxg:idxg + self.vertices_to_merge]
+                        group_1 = group_11[idxg:idxg + self.vertices_to_merge]
 
                         is_good = self.check_production_predicats(group_0, group_1, x_i, opos_i, 'x', graph)
 
@@ -61,7 +63,7 @@ class SameCoordsMatcher:
         group_0 = self.sort_verts(group_0, coord_name)
         group_1 = self.sort_verts(group_1, coord_name)
 
-        if self.vertices_to_merge==2:
+        if self.same_coords_vertices<self.vertices_to_merge:
             common_vert = self.find_common_vert(group_0, group_1, graph, coord_name)
             group_0 += common_vert
             group_1 += common_vert
@@ -78,21 +80,24 @@ class SameCoordsMatcher:
         i_0 = list(i_0)[0]
         i_1 = list(i_1)[0]
 
+        # print(f'coords {self.same_coords_vertices}')
+        # print(f'+{group_0[0].underlying}+{group_0[1].underlying}+{group_1[0].underlying}+{group_1[1].underlying}')
         # check coords values
         for i in range(len(group_0)):
             if group_0[i].pos_x() != group_1[i].pos_x() or group_0[i].pos_y() != group_1[i].pos_y():
                 return False
 
-        if (group_0[0].pos_x()+group_0[2].pos_x())/2 != (group_1[0].pos_x()+group_1[2].pos_x())/2 :
-            return False
-        if (group_0[0].pos_y() + group_0[2].pos_y())/2 != (group_1[0].pos_y() + group_1[2].pos_y())/2: ###
-            return False
+        if self.vertices_to_merge==3:
+            if (group_0[0].pos_x()+group_0[2].pos_x())/2 != (group_1[0].pos_x()+group_1[2].pos_x())/2 :
+                return False
+            if (group_0[0].pos_y() + group_0[2].pos_y())/2 != (group_1[0].pos_y() + group_1[2].pos_y())/2: ###
+                return False
 
-        if (group_0[0].pos_x()+group_0[2].pos_x())/2 != (group_0[1].pos_x()) :
-            return False
-        # print(group_1[0].pos_y(), group_1[1].pos_y(), group_1[2].pos_y())
-        if (group_1[0].pos_y() + group_1[2].pos_y())/2 != (group_1[1].pos_y()):
-            return False
+            if (group_0[0].pos_x()+group_0[2].pos_x())/2 != (group_0[1].pos_x()) :
+                return False
+            # print(group_1[0].pos_y(), group_1[1].pos_y(), group_1[2].pos_y())
+            if (group_1[0].pos_y() + group_1[2].pos_y())/2 != (group_1[1].pos_y()):
+                return False
 
         # check if 'i' vertices are connected by 'E'
         v = Vert(graph.underlying, i_0)
@@ -101,63 +106,98 @@ class SameCoordsMatcher:
         if len(i_0_neigh.intersection(i_1_neigh))==0:
             return False
 
-        subgraph_nodes = [i_0, i_1] + list(i_0_neigh.intersection(i_1_neigh)) + list(set([g.underlying for g in group_0+group_1]))
+        subgraph_nodes = [i_0, i_1] + [list(i_0_neigh.intersection(i_1_neigh))[0]] + list(set([g.underlying for g in group_0+group_1]))
 
         i_0_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_0), Vert(graph.underlying, i_0).level()+1, 'I'))
         e1_0_neigh = set(graph.get_neighbours(group_0[0], group_0[0].level(), 'I'))
         e2_0_neigh = set(graph.get_neighbours(group_0[1], group_0[1].level(), 'I'))
-        e3_0_neigh = set(graph.get_neighbours(group_0[2], group_0[2].level(), 'I'))
-        subgraph_nodes += list(e1_0_neigh.intersection(e2_0_neigh).intersection(i_0_neigh)) + list(e2_0_neigh.intersection(e3_0_neigh).intersection(i_0_neigh))
+
+        subgraph_nodes += list(e1_0_neigh.intersection(e2_0_neigh).intersection(i_0_neigh))
+
+        if self.vertices_to_merge == 3:
+            e3_0_neigh = set(graph.get_neighbours(group_0[2], group_0[2].level(), 'I'))
+            subgraph_nodes += list(e2_0_neigh.intersection(e3_0_neigh).intersection(i_0_neigh))
+
         i_1_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_1), Vert(graph.underlying, i_1).level()+1, 'I'))
         e1_1_neigh = set(graph.get_neighbours(group_1[0], group_1[0].level(), 'I'))
         e2_1_neigh = set(graph.get_neighbours(group_1[1], group_1[1].level(), 'I'))
-        e3_1_neigh = set(graph.get_neighbours(group_1[2], group_1[2].level(), 'I'))
+
         subgraph_nodes += list(e1_1_neigh.intersection(e2_1_neigh).intersection(i_1_neigh))
-        subgraph_nodes += list(e2_1_neigh.intersection(e3_1_neigh).intersection(i_1_neigh))
+        # subgraph_nodes += list(e2_1_neigh.intersection(e3_1_neigh).intersection(i_1_neigh))
+        if self.vertices_to_merge == 3:
+            e3_1_neigh = set(graph.get_neighbours(group_1[2], group_1[2].level(), 'I'))
+            subgraph_nodes += list(e2_1_neigh.intersection(e3_1_neigh).intersection(i_1_neigh))
 
         template = self.get_template()
-        # visualise_graph(template, self.level)
+        # print(f'+{group_0[0].underlying}+{group_0[1].underlying}+{group_1[0].underlying}+{group_1[1].underlying}', len(subgraph_nodes))
+        # nx.draw(graph.underlying.subgraph(subgraph_nodes), with_labels = True)
+        # plt.savefig(f'{self.same_coords_vertices}+{group_0[0].underlying}+{group_0[1].underlying}+{group_1[0].underlying}+{group_1[1].underlying}.png')
+        # plt.clf()
+        # plt.cla()
+        # nx.draw(template, with_labels = True)
+        # plt.savefig(f'{self.same_coords_vertices}++{group_0[0].underlying}+{group_0[1].underlying}.png')
+
         if not is_isomorphic(graph.underlying.subgraph(subgraph_nodes), template):
             return False
 
         return True
 
     def get_template(self):
-        base_verts = [
-            (0, {"label": "i"}),
-            (1, {"label": "i"}),
-            (2, {"label": "I"}),
-            (3, {"label": "I"}),
-            (4, {"label": "I"}),
-            (5, {"label": "I"}),
-            (6, {"label": "E"}),
-            (7, {"label": "E"}),
-            (8, {"label": "E"}),
-            (9, {"label": "E"}),
-            (10, {"label": "E"}),
-            (11, {"label": "E"}),
-        ]
+        if self.same_coords_vertices == 1:
+            base_verts = [
+                (0, {"label": "i"}),
+                (1, {"label": "i"}),
+                (2, {"label": "I"}),
+                (3, {"label": "I"}),
 
-        if self.vertices_to_merge > 2:
-            base_verts += [(12, {"label": "E"})]
+                (4, {"label": "E"}),
 
-        inner_edges = [
-            (0, 11), (1, 11),
-            (0, 2), (0,3), (1,4), (1,5),
-            (2, 9), (3,10), (3,9), (4,7), (5,8), (5,7),
-            (10,9), (8,7)
-        ]
-
-        if self.vertices_to_merge == 2:
-            inner_edges += [
-                (2, 6), (4,6),
-                (6,9), (6,7)
+                (5, {"label": "E"}),
+                (6, {"label": "E"}),
+                (7, {"label": "E"})
             ]
+            inner_edges = [
+                (0,4),(1,4),
+                (0,2),(2,5),(2,6),(5,6),
+                (1, 3), (3, 7), (3, 6),(7,6)
+            ]
+
         else:
-            inner_edges += [
-                (2, 6), (4,12),
-                (6,9), (12,7)
+            base_verts = [
+                (0, {"label": "i"}),
+                (1, {"label": "i"}),
+                (2, {"label": "I"}),
+                (3, {"label": "I"}),
+                (4, {"label": "I"}),
+                (5, {"label": "I"}),
+                (6, {"label": "E"}),
+                (7, {"label": "E"}),
+                (8, {"label": "E"}),
+                (9, {"label": "E"}),
+                (10, {"label": "E"}),
+                (11, {"label": "E"}),
             ]
+
+            if self.same_coords_vertices > 2:
+                base_verts += [(12, {"label": "E"})]
+
+            inner_edges = [
+                (0, 11), (1, 11),
+                (0, 2), (0,3), (1,4), (1,5),
+                (2, 9), (3,10), (3,9), (4,7), (5,8), (5,7),
+                (10,9), (8,7)
+            ]
+
+            if self.same_coords_vertices == 2:
+                inner_edges += [
+                    (2, 6), (4,6),
+                    (6,9), (6,7)
+                ]
+            else:
+                inner_edges += [
+                    (2, 6), (4,12),
+                    (6,9), (12,7)
+                ]
 
 
         expected_subgraph = nx.Graph()
@@ -172,13 +212,14 @@ class SameCoordsMatcher:
         common_list = []
         for iter in range(len(group_0)):
             neighs_0 = set(graph.get_neighbours(group_0[iter], group_0[iter].level(), 'E'))
-            neighs_1 = set(graph.get_neighbours(group_1[iter], group_0[iter].level(), 'E'))
-            common_list += list(neighs_0.intersection(neighs_1))
+            neighs_1 = set(graph.get_neighbours(group_1[iter], group_1[iter].level(), 'E'))
+            common_list = common_list + list(neighs_0.intersection(neighs_1))
 
         good_common = []
+        common_list = set(common_list)
+        # print(common_list)
         if len(common_list) > 0:
-            for idx in set(common_list):
-                print(idx)
+            for idx in common_list:
                 common = Vert(graph.underlying, idx)
                 is_good = True if (coord_name =='y' and common.pos_x() == group_0[0].pos_x() ) or \
                             (coord_name =='x' and common.pos_y() == group_0[0].pos_y() ) else False

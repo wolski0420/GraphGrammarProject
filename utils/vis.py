@@ -59,8 +59,8 @@ def visualise_graph(
     show_labels=True,
     show_position=True,
     move_equal=True,
-    width=8,
-    height=6,
+    width=12,
+    height=10,
     dpi=80,
 ) -> None:
     """
@@ -162,10 +162,20 @@ def visualise_graph(
             markersize=8,
         )
         if show_labels or show_position:
-            plt.text(
-                x + offset_dict[vertex][0] + 0.5,
-                y + offset_dict[vertex][1] + 1,
-                _get_node_text(G, vertex, show_labels, show_position),
-            )
+            lbl_x_pos = 0.5
+            lbl_y_pos = -1
+
+            # if (graph.find_by_pos(x, pos_y_attr[vertex])[0]).underlying == vertex:
+            #     lbl_x_pos = 0.7
+            #     lbl_y_pos = 0.75
+
+            plt.text(x + lbl_x_pos, y + lbl_y_pos,
+                     _get_node_text(G, vertex, show_labels, show_position))
+
+            # plt.text(
+            #     x + offset_dict[vertex][0] + 0.5,
+            #     y + offset_dict[vertex][1] + 1,
+            #     _get_node_text(G, vertex, show_labels, show_position),
+            # )
             # plt.text(x + 0.5, y + 1, vertex)
     plt.show()

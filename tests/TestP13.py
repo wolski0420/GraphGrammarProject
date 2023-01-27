@@ -1,50 +1,53 @@
 import unittest
+
+from productions.P13 import match_P13, P13
 from utils.vis import visualise_graph
 from utils.StandardizedGraph import StandardizedGraph
 from productions.P8 import match_P8, P8
 
 
-class TestP8(unittest.TestCase):
-    def test_match_P8_correct(self):
+
+class TestP13(unittest.TestCase):
+    def test_match_P13_correct(self):
         level = 1
         prev_level = level-1
         base_graph = StandardizedGraph()
         i1 = base_graph.add_vert(pos_x=-4, pos_y=0, level=prev_level, label="i")
         i2 = base_graph.add_vert(pos_x=4, pos_y=0, level=prev_level, label="i")
         I1 = base_graph.add_vert(pos_x=-2, pos_y=2, level=level, label="I")
-        I2 = base_graph.add_vert(pos_x=-2, pos_y=-2, level=level, label="I")
+        # I2 = base_graph.add_vert(pos_x=-2, pos_y=-2, level=level, label="I")
         I3 = base_graph.add_vert(pos_x=2, pos_y=2, level=level, label="I")
-        I4 = base_graph.add_vert(pos_x=2, pos_y=-2, level=level, label="I")
+        # I4 = base_graph.add_vert(pos_x=2, pos_y=-2, level=level, label="I")
         e1 = base_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
         e2 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
-        e3 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        # e3 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
         e5 = base_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
-        e6 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
-        base_graph.add_edges([(i1, I1), (i1, I2), (i2, I3), (i2, I4)])
-        base_graph.add_edges([(I1, e1), (I1, e5), (I2, e6), (I2, e5), (I3, e1), (I3, e2), (I4, e2), (I4, e3)])
-        base_graph.add_edges([(e1, e5), (e6, e5), (e1, e2), (e2, e3)])
+        # e6 = base_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        base_graph.add_edges([(i1, I1), (i2, I3)])
+        base_graph.add_edges([(I1, e1), (I1, e5),  (I3, e1), (I3, e2)])
+        base_graph.add_edges([(e1, e5),  (e1, e2),])
         e13 = base_graph.add_vert(pos_x=0, pos_y=1, level=prev_level, label="E")
         base_graph.add_edges([(e13, i1), (e13, i2)])
         # for debugging
         visualise_graph(base_graph, level)
 
-        i_match0, i_match1 = match_P8(base_graph, level)[0]
+        i_match0, i_match1 = match_P13(base_graph, level)[0]
 
-        new_graph = P8(base_graph, i_match0, i_match1)
+        new_graph = P13(base_graph, i_match0, i_match1)
 
         expected_graph = StandardizedGraph()
         i1 = expected_graph.add_vert(pos_x=-4, pos_y=0, level=prev_level, label="i")
         i2 = expected_graph.add_vert(pos_x=4, pos_y=0, level=prev_level, label="i")
         I1 = expected_graph.add_vert(pos_x=-2, pos_y=2, level=level, label="I")
-        I2 = expected_graph.add_vert(pos_x=-2, pos_y=-2, level=level, label="I")
+        # I2 = expected_graph.add_vert(pos_x=-2, pos_y=-2, level=level, label="I")
         I3 = expected_graph.add_vert(pos_x=2, pos_y=2, level=level, label="I")
-        I4 = expected_graph.add_vert(pos_x=2, pos_y=-2, level=level, label="I")
+        # I4 = expected_graph.add_vert(pos_x=2, pos_y=-2, level=level, label="I")
         e1 = expected_graph.add_vert(pos_x=0, pos_y=4, level=level, label="E")
         e2 = expected_graph.add_vert(pos_x=0, pos_y=0, level=level, label="E")
-        e3 = expected_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
-        expected_graph.add_edges([(i1, I1), (i1, I2), (i2, I3), (i2, I4)])
-        expected_graph.add_edges([(I1, e1), (I1, e2), (I2, e3), (I2, e2), (I3, e1), (I3, e2), (I4, e2), (I4, e3)])
-        expected_graph.add_edges([(e1, e2), (e2, e3)])
+        # e3 = expected_graph.add_vert(pos_x=0, pos_y=-4, level=level, label="E")
+        expected_graph.add_edges([(i1, I1), (i2, I3)])
+        expected_graph.add_edges([(I1, e1), (I1, e2), (I3, e1), (I3, e2)])
+        expected_graph.add_edges([(e1, e2)])
         e13 = expected_graph.add_vert(pos_x=0, pos_y=1, level=prev_level, label="E")
         expected_graph.add_edges([(e13, i1), (e13, i2)])
 

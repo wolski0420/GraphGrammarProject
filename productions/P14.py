@@ -3,12 +3,15 @@ import networkx as nx
 from networkx.algorithms.isomorphism import is_isomorphic
 from itertools import combinations
 
-def P11(graph: StandardizedGraph, v0_group: list, v1_group: list):
+def P14(graph: StandardizedGraph, v0_group: list, v1_group: list):
 
     # # find vertices on the same position
     v0_vertices = [v0_group[0]] + [v1_group[0]]
     v1_vertices = [v0_group[1]] + [v1_group[1]]
     # v2_vertices = [v0_group[2]] + [v1_group[2]]
+
+    for x in v0_vertices+v1_vertices:
+        print( x.underlying, x.pos_x(), x.pos_y(), x.label())
 
     # find neighbours of one vertex on each position
     v0_1_neigh = (graph.get_neighbours(v1_vertices[0], v1_vertices[0].level(), label = "I") +
@@ -32,7 +35,7 @@ def P11(graph: StandardizedGraph, v0_group: list, v1_group: list):
 
     return graph
 
-def match_P11(graph: StandardizedGraph, level:int, i_small=True):
+def match_P14(graph: StandardizedGraph, level:int, i_small=True):
     return match(graph, level, i_small)
 
 
@@ -95,13 +98,10 @@ def check_production_predicats(graph, vert1, vert2, vert3, vert4, between_vert, 
                                 directly_connected(graph.underlying, vert4.underlying, between_vert):
                                     return False
 
-    if i_small:
-        i_0_list = graph.get_i_neighbours(Vert(graph.underlying, between_vert), vert1.level())
-        i_1_list = graph.get_i_neighbours(vert3, vert1.level())
-    else:
-        i_0_list = graph.get_I_neighbours(Vert(graph.underlying, between_vert), vert1.level())+graph.get_i_neighbours(Vert(graph.underlying, between_vert), vert1.level())
-        i_1_list = graph.get_I_neighbours(vert3, vert1.level())+graph.get_i_neighbours(vert3, vert1.level())
-        print(vert1.level(), between_vert, i_0_list)
+
+    i_0_list = graph.get_i_neighbours(Vert(graph.underlying, between_vert), vert1.level())
+    i_1_list = graph.get_i_neighbours(vert3, vert1.level())
+
 
     if len(i_0_list) != len(i_1_list) != 1:
         return False
@@ -109,14 +109,11 @@ def check_production_predicats(graph, vert1, vert2, vert3, vert4, between_vert, 
     i_0 = i_0_list[0]
     i_1 = i_1_list[0]
 
-    i_0_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_0), Vert(graph.underlying, i_0).level(), 'E'))
-    i_1_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_1), Vert(graph.underlying, i_1).level(), 'E'))
-    if len(i_0_neigh.intersection(i_1_neigh))==0:
-        return False
-
-    subgraph_nodes = [i_0, i_1]  + [vert1.underlying, vert2.underlying, vert3.underlying, vert4.underlying, between_vert] + [list(i_0_neigh.intersection(i_1_neigh))[0]]
+    subgraph_nodes = i_0_list+ [ i_1]  + [vert1.underlying, vert2.underlying, vert3.underlying, vert4.underlying, between_vert] #+ [list(i_0_neigh.intersection(i_1_neigh))[0]]
 
     i_0_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_0), Vert(graph.underlying, i_0).level()+1, 'I'))
+
+    i_0_neigh = set(graph.get_neighbours(Vert(graph.underlying, i_0_list[1]), Vert(graph.underlying, i_0).level() + 1, 'I') + list(i_0_neigh))
     e1_0_neigh = set(graph.get_neighbours(vert1, vert1.level(), 'I'))
     e2_0_neigh = set(graph.get_neighbours(Vert(graph.underlying, between_vert), vert1.level(), 'I'))
     e3_0_neigh = set(graph.get_neighbours(vert2, vert2.level(), 'I'))
@@ -144,13 +141,13 @@ def get_template():
         (6, {"label": "E"}),
         (7, {"label": "E"}),
         (8, {"label": "E"}),
-        (9, {"label": "E"}),
+        (9, {"label": "i"}),
         (10, {"label": "E"})
     ]
             
     inner_edges = [
-        (0, 9), (1, 9),
-        (0, 2), (0, 3), (1, 4),
+        # (0, 9), (1, 9),
+        (0, 2), (9, 3), (1, 4),
         (2, 5), (3, 6), (3, 5), (4, 8),
         (5, 6),
         (8, 7), (4, 7),
